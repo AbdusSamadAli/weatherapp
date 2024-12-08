@@ -1,4 +1,4 @@
-WeatherApp
+
 WeatherApp is a web application that allows users to check the weather in any city and view a detailed report of their searches. The app is built with React for the frontend, Node.js for the backend, and SQL (MySQL) for data storage. The app implements secure user authentication with JWT (JSON Web Tokens) for login and registration. The weather data is fetched from the WeatherStack API to provide real-time forecasts.
 
 Features
