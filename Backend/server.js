@@ -77,7 +77,7 @@ app.post("/login", (req, res) => {
 
 app.get("/weather", authenticateJWT, async (req, res) => {
   const city = req.query.city;
-  const apiKey = "26ce867270fd0b841f7e7d7916bfb67d";
+  const apiKey = process.env.apikey;
   const url = `http://api.weatherstack.com/current?access_key=${apiKey}&query=${city}`;
 
   try {
