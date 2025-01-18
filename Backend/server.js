@@ -23,12 +23,10 @@ db.connect((err) => {
   console.log("Connected to MySQL");
 });
 
-// Root route
 app.get("/", (req, res) => {
   res.send("Welcome to the weather app API");
 });
 
-// JWT Authentication Middleware
 function authenticateJWT(req, res, next) {
   const token = req.headers["authorization"]?.split(" ")[1]; // Extract token
 
@@ -41,13 +39,9 @@ function authenticateJWT(req, res, next) {
   });
 }
 
-// 1. User Signup Route with bcryptjs for password hashing
 app.post("/signup", async (req, res) => {
   const { username, password } = req.body;
-
-  // Hash password before saving it to the database
   const hashedPassword = await bcrypt.hash(password, 10);
-
   db.query(
     "INSERT INTO users (username, password) VALUES (?, ?)",
     [username, hashedPassword],
@@ -58,7 +52,6 @@ app.post("/signup", async (req, res) => {
   );
 });
 
-// 2. User Login Route with bcryptjs for password verification
 app.post("/login", (req, res) => {
   const { username, password } = req.body;
 
@@ -68,15 +61,10 @@ app.post("/login", (req, res) => {
     async (err, result) => {
       if (err || result.length === 0)
         return res.status(401).send("Invalid credentials");
-
       const user = result[0];
-
-      // Verify hashed password
       const isPasswordCorrect = await bcrypt.compare(password, user.password);
       if (!isPasswordCorrect)
         return res.status(401).send("Invalid credentials");
-
-      // Create JWT token
       const token = jwt.sign(
         { username: user.username },
         process.env.JWT_SECRET,
@@ -87,7 +75,6 @@ app.post("/login", (req, res) => {
   );
 });
 
-// 3. Weather Search API (Without Weather API Key, just returning sample data)
 app.get("/weather", authenticateJWT, async (req, res) => {
   const city = req.query.city;
   const apiKey = "26ce867270fd0b841f7e7d7916bfb67d";
@@ -96,8 +83,6 @@ app.get("/weather", authenticateJWT, async (req, res) => {
   try {
     const response = await axios.get(url);
     const weatherData = response.data;
-
-    // Save weather search report to the database
     db.query(
       "INSERT INTO weather_reports (username, city, weather_info) VALUES (?, ?, ?)",
       [req.user.username, city, JSON.stringify(weatherData)],
@@ -110,8 +95,6 @@ app.get("/weather", authenticateJWT, async (req, res) => {
     res.status(500).send("Error fetching weather data");
   }
 });
-
-// Get weather reports for a specific user
 app.get("/weather-reports", authenticateJWT, (req, res) => {
   const username = req.user.username;
 
